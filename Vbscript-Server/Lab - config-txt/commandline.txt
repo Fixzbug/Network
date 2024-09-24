@@ -1,0 +1,40 @@
+Basic Network command By jodol
+-ping
+ipconfig
+ping www.google.com
+ping cisco is use #telnet
+=====================
+-tracerroute www.google.com
+ધ䇨Ҽ蒹 Ò്ì䋹꩒獊======================
+-arp
+˒ mac address
+======================
+-nslookup
+-check ip 
+1.nslookup
+2.set type=a
+3.website search
+-check MX
+1.set type =mx
+2.jodoi.com
+3.check mail --> mail
+>server ip 
+-check ns
+1.set type=ns
+2.jodoi.com
+=======================
+-netstat
+check service 婹璧녒·ҧ 
+portnumber ---> website potocol use tcp:80
+ 
+=======================
+-telnet
+telnet www.jodoi.com tcp:23
+telnet www.jodoi.com tcp:80
+telnet mail.jodoi.com tcp:25
+mail from: mail respons
+rcpt to:mail resip
+data enter data
+quit
+server port:80
+

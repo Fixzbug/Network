@@ -1,0 +1,48 @@
+command 
+access-list[type][if else][potocol][ip host] host[server]eq[port typepotocol]
+[type]
+-standard 1-99
+-extended 100-199
+
+[if else]
+-deny (all)
+-permit (some)
+
+ex
+-access-list 100 deny tcp 192.168.1.2 host 20.20.20.3 eq 20
+-access-list 100 permit ip any any
+
+
+port 80 HTTPS == webserver
+port 21 FTP == FTPserver
+
+
+if 192.168.1.2  & 192.168.3.2 
+	access webserver
+
+else if 192.168.2.2 & 192.168.4.2
+	no access webserver
+
+else if 192.168.1.2 
+	no access ftp 
+
+esle if 192.168.2.2 & 192.168.3.2 & 192.168.4.2
+	acess ftp 
+
+else Any Any
+
+
+
+Router#
+Router#conf t
+Router(config)#no access-list [number accesslist]
+
+*** int f[number port]
+*** ip access-group [number access-list] in
+
+
+access-list 100 deny tcp 192.168.1.0 0.0.0.255 host 20.20.20.3 eq ftp
+access-list 100 deny tcp 192.168.2.0 0.0.0.255 host 20.20.20.2 eq 80
+access-list 100 deny tcp 192.168.4.0 0.0.0.255 host 20.20.20.2 eq 80
+access-list 100 deny tcp 192.168.4.0 0.0.0.255 host 20.20.20.3 eq ftp
+access-list 100 permit ip any any

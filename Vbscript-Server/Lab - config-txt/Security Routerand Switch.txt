@@ -1,0 +1,8 @@
+R0(config)#line vty 0 4
+R0(config-line)#password cisco
+R0(config-line)#login 
+R0(config-line)#end
+R0(config)#
+R0(config)#enable password cisco
+R0(config)#end
+R0#

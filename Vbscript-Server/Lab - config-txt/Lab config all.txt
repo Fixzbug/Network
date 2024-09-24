@@ -1,0 +1,274 @@
+=========================================
+1.Noshut ที่ Router
+=========================================
+Router#
+Router#conf t
+Router(config)#interface f0/0
+Router(config-if)#no shutdown 
+Router(config-if)#
+Router#
+
+=========================================
+1.1 create subinterface 
+=========================================
+Router>en
+Router#conf t
+Router(config)#interface f0/0.[number vlan]
+Router(config-subif)#encapsulation dot1Q [number vlan]
+Router(config-subif)#ip address [ ip 0.0.0.0] [ mask 0.0.0.0]
+Router(config-subif)#
+Router#
+----------------------------------------------------------
+Router>en
+Router#conf t
+Router(config)#interface f0/0.40
+Router(config-subif)#encapsulation dot1Q 40
+Router(config-subif)#ip address 192.168.4.1 255.255.255.0
+Router(config-subif)#
+Router#
+
+Router#sh ip int br
+Interface              IP-Address      OK? Method Status                Protocol
+ 
+FastEthernet0/0        unassigned      YES unset  up                    up
+ 
+FastEthernet0/0.40     192.168.4.1     YES manual up                    up
+ 
+FastEthernet0/0.50     192.168.5.1     YES manual up                    up
+ 
+FastEthernet0/0.60     192.168.6.1     YES manual up                    up
+ 
+FastEthernet0/1        10.10.2.2       YES manual up                    up
+ 
+Vlan1                  unassigned      YES unset  administratively down down
+Router#
+
+=========================================
+1.2 Create DHCP Pool to vlan
+=========================================
+Router#conf t
+Router(config)#ip dhcp pool  [name pool]
+Router(dhcp-config)#network [ network id 0.0.0.0] [ mask 0.0.0.0]
+Router(dhcp-config)#default-router [ ip 0.0.0.0] ของ subinterface
+Router(dhcp-config)#end
+Router#sh run
+---------------------------------------------------------------
+
+Router#conf t
+Router(config)#ip dhcp pool  chanal4
+Router(dhcp-config)#network 192.168.4.0 255.255.255.0
+Router(dhcp-config)#default-router 192.168.4.1
+Router(dhcp-config)#end
+Router#sh run
+
+ip dhcp pool chanal4
+ network 192.168.4.0 255.255.255.0
+ default-router 192.168.4.1
+ip dhcp pool chanal5
+ network 192.168.5.0 255.255.255.0
+ default-router 192.168.5.1
+ip dhcp pool chanal6
+ network 192.168.6.0 255.255.255.0
+ default-router 192.168.6.1
+
+=========================================
+1.3 IP Route (ทำทั้งสอง ฝั่ง **สลับกัน) **สำคัญ
+=========================================
+Router#conf t
+Router(config)#ip route [network id 0.0.0.0] [mask 0.0.0.0] [gateway 0.0.0.0]
+-------------------------------------------------------------
+Router#conf t
+Router(config)#ip route 192.168.1.0 255.255.255.0 10.10.2.1
+Router(config)#ip route 192.168.2.0 255.255.255.0 10.10.2.1
+Router(config)#ip route 192.168.3.0 255.255.255.0 10.10.2.1
+Router#sh run
+
+ip classless
+ip route 192.168.1.0 255.255.255.0 10.10.2.1 
+ip route 192.168.2.0 255.255.255.0 10.10.2.1 
+ip route 192.168.3.0 255.255.255.0 10.10.2.1 
+!
+
+
+=========================================
+2.mode trunk switch to switch all switch
+=========================================
+Switch>
+Switch>en
+Switch#conf t
+Switch(config)#interface f0/1
+Switch(config-if)#switchport mode trunk 
+Switch(config-if)#
+
+Switch#sh run
+!
+interface FastEthernet0/1
+ switchport mode trunk
+!
+interface FastEthernet0/2
+!
+Switch#
+
+============================
+จำลอง vlan ที่มันจะต้องผ่าน
+============================
+Switch>en
+Switch#conf t
+Switch(config)#vlan 50
+Switch(config)#vlan 60
+Switch(config-vlan)#ex
+Switch(config)#
+Switch#
+
+===============================================
+2.1 make port access in swicth
+===============================================
+Switch>en
+Switch#conf t
+Switch(config)#vlan [number vlan]
+Switch(config-vlan)#name [name vlan]
+Switch(config-vlan)#end
+Switch#sh vlan 
+---------------------------------------------------
+Switch>en
+Switch#conf t
+Switch(config)#vlan 40
+Switch(config-vlan)#name f4
+Switch(config-vlan)#end
+Switch#sh vlan 
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/3, Fa0/4, Fa0/5, Fa0/6
+                                                Fa0/7, Fa0/8, Fa0/9, Fa0/10
+                                                Fa0/11, Fa0/12, Fa0/13, Fa0/14
+                                                Fa0/15, Fa0/16, Fa0/17, Fa0/18
+                                                Fa0/19, Fa0/20, Fa0/21, Fa0/22
+                                                Fa0/23, Fa0/24
+40   f4                               active    
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0
+40   enet  100040     1500  -      -      -        -    -        0      0
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+
+Remote SPAN VLANs
+------------------------------------------------------------------------------
+
+
+Primary Secondary Type              Ports
+------- --------- ----------------- ------------------------------------------
+Switch#
+
+===============================================
+2.2 move vlan default to vlan new create
+===============================================
+
+Switch#
+Switch#conf t
+Switch(config)#interface range f0/2 - f0/24
+Switch(config-if-range)#switchport mode access 
+Switch(config-if-range)#switchport access vlan 40
+Switch(config-if-range)#
+Switch#sh vla
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    
+40   f4                               active    Fa0/2, Fa0/3, Fa0/4, Fa0/5
+                                                Fa0/6, Fa0/7, Fa0/8, Fa0/9
+                                                Fa0/10, Fa0/11, Fa0/12, Fa0/13
+                                                Fa0/14, Fa0/15, Fa0/16, Fa0/17
+                                                Fa0/18, Fa0/19, Fa0/20, Fa0/21
+                                                Fa0/22, Fa0/23, Fa0/24
+50   VLAN0050                         active    
+60   VLAN0060                         active    
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0
+40   enet  100040     1500  -      -      -        -    -        0      0
+50   enet  100050     1500  -      -      -        -    -        0      0
+60   enet  100060     1500  -      -      -        -    -        0      0
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+
+Remote SPAN VLANs
+------------------------------------------------------------------------------
+
+
+Primary Secondary Type              Ports
+------- --------- ----------------- ------------------------------------------
+Switch#
+Switch#conf t
+Switch(config)#int f0/3
+Switch(config-if)#sw mode trunk 
+Switch(config-if)#end
+Switch#
+Switch#sh run
+!
+interface FastEthernet0/1
+ switchport mode trunk
+!
+interface FastEthernet0/2
+ switchport access vlan 40
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet0/4
+ switchport access vlan 40
+ switchport mode access
+!
+Switch#
+
+
+=================================================
+3.switchport trunk allowed vlan add 40,50,60
+=================================================
+Switch#
+Switch#conf t
+Switch(config)#interface f0/1
+Switch(config-if)#switchport trunk allowed vlan add 40
+Switch(config-if)#switchport trunk allowed vlan add 50
+Switch(config-if)#switchport trunk allowed vlan add 60
+Switch(config-if)#end
+Switch#
+Switch#sh int trunk
+
+Port        Mode         Encapsulation  Status        Native vlan
+Fa0/1       on           802.1q         trunking      1
+Fa0/3       on           802.1q         trunking      1
+
+Port        Vlans allowed on trunk
+Fa0/1       1-1005
+Fa0/3       1-1005
+
+Port        Vlans allowed and active in management domain
+Fa0/1       1,40,50,60
+Fa0/3       1,40,50,60
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Fa0/1       1,40,50,60
+Fa0/3       1,40,50,60
+Switch#
+
+
+
+

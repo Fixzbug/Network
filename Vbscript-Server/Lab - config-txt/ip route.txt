@@ -1,0 +1,17 @@
+conf t 
+int f0/0 
+ip address 10.10.5.1 255.255.255.252 
+no shutdown 
+ex
+do sh run int f0/0
+ex
+
+
+==============
+conf t 
+int f0/0 
+ip address 10.10.5.2 255.255.255.252 
+no shutdown 
+ex
+do sh run int f0/0
+ex

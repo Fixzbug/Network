@@ -1,0 +1,142 @@
+1.ทำที่  switch ให้เป็นโหมด trunk คือการนำ switch ต่อ switch กันต้องให้เป็นโหมด trunk
+-กำหนด port ที่เหลือจากทั้งหมด(เหลือจาก port ที่นำไปทำ trunk)ให้เป็น access แล้วแต่ desing 
+เช่น f0/0,f0/1 เป็น trunk -port ที่เหลือจะเป็น access port ทั้งหมด ก้คือ เหลือ f0/2-f0/24 
+จะเป็น port acess ทั้งหมด
+-ใช้ command 
+-interface f[port ที่ต่อสาย จาก switch to switch]
+-swicthport mode trunk
+-no shutdows
+!!!
+interface FastEthernet0/1
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport mode trunk
+!
+ทำ vlan switchport mode access
+interface FastEthernet0/2-24
+  vlan switchport mode access
+!
+-ใช่้ command
+ตั้งชื่อ vlan 
+SW1>
+SW1>en
+SW1#conf t
+SW1(config)#
+SW1(config)#vlan 10
+SW1(config-vlan)#name f1
+SW1(config-vlan)#ex
+SW1(config)#ex
+SW1#sh vlan 
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/2, Fa0/4, Fa0/5, Fa0/6
+                                                Fa0/7, Fa0/8, Fa0/9, Fa0/10
+                                                Fa0/11, Fa0/12, Fa0/13, Fa0/14
+                                                Fa0/15, Fa0/16, Fa0/17, Fa0/18
+                                                Fa0/19, Fa0/20, Fa0/21, Fa0/22
+                                                Fa0/23, Fa0/24
+10   f1                               active    
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0
+10   enet  100010     1500  -      -      -        -    -        0      0
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+
+Remote SPAN VLANs
+------------------------------------------------------------------------------
+
+
+Primary Secondary Type              Ports
+------- --------- ----------------- ------------------------------------------
+SW1#conf t
+SW1(config)#interface range f0/2 - f0/24
+SW1(config-if-range)#switchport mode access 
+SW1(config-if-range)#switchport access vlan 10
+SW1(config)#end
+SW1#sh vlan
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    
+10   f1                               active    Fa0/2, Fa0/3, Fa0/4, Fa0/5
+                                                Fa0/6, Fa0/7, Fa0/8, Fa0/9
+                                                Fa0/10, Fa0/11, Fa0/12, Fa0/13
+                                                Fa0/14, Fa0/15, Fa0/16, Fa0/17
+                                                Fa0/18, Fa0/19, Fa0/20, Fa0/21
+                                                Fa0/22, Fa0/23, Fa0/24
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0
+10   enet  100010     1500  -      -      -        -    -        0      0
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+
+Remote SPAN VLANs
+------------------------------------------------------------------------------
+
+
+Primary Secondary Type              Ports
+------- --------- ----------------- ------------------------------------------
+SW1#
+===================
+-ย้ายตัวเดียว
+===================
+SW3#conf t
+SW3(config)#interface fa0/2
+SW3(config-if)#switchport mode access 
+SW3(config-if)#switchport access vlan 30
+SW3(config-if)#end
+SW3#
+SW3#
+SW3#sh vlan 
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/3, Fa0/4, Fa0/5, Fa0/6
+                                                Fa0/7, Fa0/8, Fa0/9, Fa0/10
+                                                Fa0/11, Fa0/12, Fa0/13, Fa0/14
+                                                Fa0/15, Fa0/16, Fa0/17, Fa0/18
+                                                Fa0/19, Fa0/20, Fa0/21, Fa0/22
+                                                Fa0/23, Fa0/24
+30   f3                               active    Fa0/2
+1002 fddi-default                     act/unsup 
+1003 token-ring-default               act/unsup 
+1004 fddinet-default                  act/unsup 
+1005 trnet-default                    act/unsup 
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001     1500  -      -      -        -    -        0      0
+30   enet  100030     1500  -      -      -        -    -        0      0
+1002 fddi  101002     1500  -      -      -        -    -        0      0   
+1003 tr    101003     1500  -      -      -        -    -        0      0   
+1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+
+===============================================================================
+ทำให้ switch อนุญาติให้ vlan ที่ไม่รู้จักผ่าน 
+*** mode trunk คือทำขี้นมาเพื่อเป็นทางผ่านของ vlan ***
+-ใช้ command
+-เข้าไปที่ interface f[port ที่เป็น port trunk]
+-switchport trunk allowed vlan[add หรือกด shift ?] ตามด้วย [number vlan] 
+
+===============================================================================
+
+sh int trunk 
+sh vlan 
